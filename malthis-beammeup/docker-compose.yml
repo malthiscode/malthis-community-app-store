@@ -1,37 +1,62 @@
-version: "3.7"
-
 services:
-  app_proxy:
-    environment:
-      APP_HOST: beammeup_frontend_1
-      APP_PORT: 8201
-
-  # Interface Web
-  frontend:
-    image: joshuagessner/beammeup-frontend:latest
-    restart: unless-stopped
-    environment:
-      - BACKEND_URL=http://backend:8200
-    depends_on:
-      - backend
-
-  # API de gestion
+  # Backend API
   backend:
-    image: joshuagessner/beammeup-backend:latest
-    restart: unless-stopped
-    volumes:
-      - ${APP_DATA_DIR}/data:/app/data
-    environment:
-      - NODE_ENV=production
-      - PORT=8200
-
-  # Le serveur de jeu BeamMP lui-même
-  beammp:
-    image: joshuagessner/beammeup-beammp:latest
-    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: beammeup-backend
     ports:
+      - "8200:3000"
+    environment:
+      NODE_ENV: production
+      FASTIFY_PORT: 3000
+      SESSION_SECRET: ${SESSION_SECRET:-change-me-in-production-min-32-chars}
+      DATABASE_URL: file:/app/data/beammeup.db
+      BEAMMP_CONTAINER_NAME: beammp
+      BEAMMP_CONFIG_PATH: /beammp-data/ServerConfig.toml
+      BEAMMP_RESOURCES_PATH: /beammp-data/Resources
+      MAX_MOD_SIZE: 2048
+      # Docker socket access - automatically works on Docker Desktop (Windows/Mac/Linux)
+      # For native Windows Docker (Hyper-V), set DOCKER_HOST=npipe:////./pipe/docker_engine
+      DOCKER_HOST: ${DOCKER_HOST:-unix:///var/run/docker.sock}
+    volumes:
+      - ./data:/app/data
+      - ./beammp-config:/beammp-data
+      # Docker socket - Docker Desktop automatically handles this on Windows/Mac/Linux
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - beammeup
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: beammeup-frontend
+    ports:
+      - "8201:3000"
+    environment:
+      NODE_ENV: production
+    networks:
+      - beammeup
+
+  # BeamMP server
+  beammp:
+    image: mbentley/beammp-server:latest
+    container_name: beammp
+    ports:
+      - "30814:30814/tcp"
       - "30814:30814/udp"
     volumes:
-      - ${APP_DATA_DIR}/data/beammp:/server
+      - ./beammp-config:/data
     depends_on:
       - backend
+    healthcheck:
+      test: ["CMD", "test", "-f", "/data/ServerConfig.toml"]
+      interval: 5s
+      timeout: 1s
+      retries: 120  # Wait up to 10 minutes for config file
+
+networks:
+  beammeup:
+    driver: bridge
