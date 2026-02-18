@@ -1,0 +1,34 @@
+manifestVersion: 1
+id: beammeup
+name: BeamMeUp
+tagline: Panel d'administration pour serveur BeamMP
+category: Gaming
+version: "1.0.0"
+port: 8201
+description: >-
+  BeamMeUp est un panel d'administration web complet pour gérer votre serveur de jeu BeamMP (Multiplayer pour BeamNG.drive).
+
+
+  Il permet de configurer votre serveur, gérer les mods et surveiller les logs sans toucher aux fichiers de configuration manuellement.
+
+
+  Caractéristiques :
+  - Gestion des mods (Upload et activation)
+  - Éditeur de configuration du serveur
+  - Monitoring en temps réel et logs
+  - Gestion des rôles (Owner, Admin, Operator)
+
+
+  Note : Le port 30814 (UDP) doit être ouvert sur votre routeur pour que les joueurs puissent rejoindre votre serveur.
+developer: Joshua Gessner
+website: https://github.com/JoshuaGessner/beammeup
+submitter: malthis
+submission: ''
+repo: https://github.com/JoshuaGessner/beammeup
+support: https://github.com/JoshuaGessner/beammeup/issues
+icon:
+gallery:
+path: ""
+defaultPassword: ""
+releaseNotes: >
+  Première version pour Umbrel OS. Inclut le serveur BeamMP et l'interface d'administration.
