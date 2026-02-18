@@ -1,5 +1,5 @@
 manifestVersion: 1
-id: beammeup
+id: malthis-beammeup
 name: BeamMeUp
 tagline: Panel d'administration pour serveur BeamMP
 category: Gaming
@@ -31,4 +31,5 @@ gallery:
 path: ""
 defaultPassword: ""
 releaseNotes: >
+
   Première version pour Umbrel OS. Inclut le serveur BeamMP et l'interface d'administration.
